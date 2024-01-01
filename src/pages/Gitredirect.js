@@ -4,13 +4,39 @@ import { App } from "octokit";
 import Bio from '../component/Bio';
 import { useSearchParams } from 'react-router-dom';
 import GitHubCalendar from 'react-github-contribution-calendar';
+import Lottie from 'react-lottie';
+import '../App.css'; 
+import * as animationData from './githubani.json';
+import * as loading from './loading.json';
 const Gitredirect= () => {
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true, 
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
+ 
+  const loadOptions = {
+    loop: true,
+    autoplay: true, 
+    animationData: loading,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
+
+
   const [name,sname]=useState();
   const [pic,spic]=useState();
   const [rno,srno]=useState();
   const [joindate,sjoindate]=useState();
   const [uid,suid]=useState();
   const [accessToken,sat]=useState("");
+  const [ifaccess,sif]=useState(true);
+  const [loader,sloader]=useState(true);
   var values = {
     '2016-06-23': 1,
     '2016-06-26': 2,
@@ -55,17 +81,28 @@ const Gitredirect= () => {
     suid(userDetails.login);
     srno(userDetails.public_repos);
     sjoindate(userDetails.created_at);
-    console.log(userDetails);
+    sloader(false);
     var x=await axios.get("http://localhost:3001/gitaccesstoken?userid="+userDetails.login);
      if(x.data=="not given access yet"){
-      window.location.href="https://github.com/apps/0xdevgram/installations/new";
+      sif(false);
+      setTimeout(()=>{
+        window.location.href="https://github.com/apps/0xdevgram/installations/new";
+      },4000);
     }
 
     return userDetails;
   };
   return (
     <div>
-      <div>
+      {loader? 
+      <>
+      <Lottie options={loadOptions}
+              height={400}
+              width={400}
+              isStopped={false}
+              isPaused={false}/>
+              </>:<>
+      {ifaccess?<div>
       <Bio
         avatar={pic}
         name={name}
@@ -75,7 +112,17 @@ const Gitredirect= () => {
         contributionsThisYear={100}
       />
       <GitHubCalendar values={values} until={until}/>
-    </div>
+    </div>:<>
+    <Lottie options={defaultOptions}
+              height={400}
+              width={400}
+              isStopped={false}
+              isPaused={false}/>
+              <h2>Connect your github redirecting...</h2>
+    </>
+}
+      </>
+}
     </div>
   );
 };
