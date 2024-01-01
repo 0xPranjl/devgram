@@ -6,9 +6,18 @@ import { useSearchParams } from 'react-router-dom';
 import GitHubCalendar from 'react-github-contribution-calendar';
 import Lottie from 'react-lottie';
 import '../App.css'; 
+import { Octokit } from "https://esm.sh/@octokit/core";
 import * as animationData from './githubani.json';
+import { Chart } from "react-google-charts";
+
 import * as loading from './loading.json';
 const Gitredirect= () => {
+ 
+  
+   const options = {
+    title: "Mostly used language",
+    pieSliceText: "label",
+  };
 
   const defaultOptions = {
     loop: true,
@@ -37,6 +46,7 @@ const Gitredirect= () => {
   const [accessToken,sat]=useState("");
   const [ifaccess,sif]=useState(true);
   const [loader,sloader]=useState(true);
+  const [data,sdata]=useState([]);
   var values = {
     '2016-06-23': 1,
     '2016-06-26': 2,
@@ -59,6 +69,7 @@ const Gitredirect= () => {
       var t=await axios.get("http://localhost:3001/code2token?code="+params.get("code"));
       sat(t.data);
       getUserDetails(t.data);
+      getrepo(t.data);
 
     };
   }
@@ -67,7 +78,51 @@ const Gitredirect= () => {
     }
   
   }, []);
+  const getrepo=async(accessToken)=>{
+  const octokit = new Octokit({
+    auth: accessToken
+  })
   
+  var x=await octokit.request('GET /user/repos', {
+    headers: {
+      'X-GitHub-Api-Version': '2022-11-28'
+    },
+    per_page:100
+  });
+  const newArray = x.data.map(({ language }) => (language ));
+  const filteredArray = newArray.filter((element) => element !== null);
+  const occurrencesArray = countOccurrences(filteredArray);
+  var datar=[["lang","known"]];
+  const all = [...datar, ...occurrencesArray];
+  sdata(all);
+ // const d=countUniqueCombinations(newArray);
+  console.log(newArray);
+
+
+}
+function countOccurrences(arr) {
+  return Object.entries(
+    arr.reduce((acc, value) => {
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {})
+  ).map(([value, count]) => [value, count]);
+}
+
+
+
+function getDistinctElements(arr) {
+  // Use a Set to store distinct elements
+  const distinctSet = new Set(arr);
+
+  // Convert the Set back to an array
+  const distinctArray = Array.from(distinctSet);
+
+  return distinctArray;
+}
+
+
+
   const getUserDetails = async (accessToken) => {
     const response = await axios.get('https://api.github.com/user', {
       headers: {
@@ -112,6 +167,13 @@ const Gitredirect= () => {
         contributionsThisYear={100}
       />
       <GitHubCalendar values={values} until={until}/>
+      <Chart
+      chartType="PieChart"
+      data={data}
+      options={options}
+      width={"100%"}
+      height={"150px"}
+    />
     </div>:<>
     <Lottie options={defaultOptions}
               height={400}
