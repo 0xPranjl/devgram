@@ -8,7 +8,7 @@ const Github = () => {
  const REDIRECT_URI="http://localhost:3000/gitredirect";
  const CLIENT_ID="Iv1.65b8afe4ea264973"
  const x=()=>{
-  window.location.href="https://github.com/apps/0xpranjldevgram/installations/new";
+  window.location.href="https://github.com/apps/0xdevgram/installations/new";
  //window.location.href=`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`
  } 
  return (

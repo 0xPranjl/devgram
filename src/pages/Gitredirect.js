@@ -10,7 +10,7 @@ const Gitredirect= () => {
   const [rno,srno]=useState();
   const [joindate,sjoindate]=useState();
   const [uid,suid]=useState();
-
+  const [accessToken,sat]=useState("");
   var values = {
     '2016-06-23': 1,
     '2016-06-26': 2,
@@ -23,50 +23,46 @@ const Gitredirect= () => {
  console.log(params.get("code"));
  console.log(params.get("installation_id"));
   useEffect(() => {
+   
     const handleCallback = async () => {
-      // const code = new URLSearchParams(window.location.search).get('code');
-      // console.log(code);
-      // const token=await getUserDetails("ghu_ZBWCSQCZdblSulasIY3izSGvyGxs2s1TqmOq");
-      // console.log("token"+token);
+      if(params.get("installation_id")!=undefined){
+        var x=await axios.get("http://localhost:3001/addgitaccess?code="+params.get("code"));
+        getUserDetails(x.data);
+      }
+      else{
+      var t=await axios.get("http://localhost:3001/code2token?code="+params.get("code"));
+      sat(t.data);
+      getUserDetails(t.data);
 
-    
-
-      //   const response = await axios.post('YOUR_BACKEND_SERVER_URL/github/callback', { code });
-    //   console.log(response.data); // Handle the response, store the token, etc.
     };
-
+  }
+    if(accessToken==""){
     handleCallback();
+    }
   
   }, []);
-  y("ghu_ygUFFErjh2b5EgQU1aeA6aMLjzrOA60UBeBN");
-  async function y(accessToken){
-    const response = await axios.get('https://api.github.com/user/repos', {
+  
+  const getUserDetails = async (accessToken) => {
+    const response = await axios.get('https://api.github.com/user', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(response);
-  }
-  // const getUserDetails = async (accessToken) => {
-  //   const response = await axios.get('https://api.github.com/user', {
-  //     headers: {
-  //       Authorization: `Bearer ${accessToken}`,
-  //     },
-  //   });
   
-  //   const userDetails = response.data;
-  //   sname(userDetails.name);
-  //   spic(userDetails.avatar_url);
-  //   suid(userDetails.login);
-  //   srno(userDetails.public_repos);
-  //   sjoindate(userDetails.created_at);
-  //   console.log(userDetails);
+    const userDetails = response.data;
+    sname(userDetails.name);
+    spic(userDetails.avatar_url);
+    suid(userDetails.login);
+    srno(userDetails.public_repos);
+    sjoindate(userDetails.created_at);
+    console.log(userDetails);
+    var x=await axios.get("http://localhost:3001/gitaccesstoken?userid="+userDetails.login);
+     if(x.data=="not given access yet"){
+      window.location.href="https://github.com/apps/0xdevgram/installations/new";
+    }
 
-
-
-
-  //   return userDetails;
-  // };
+    return userDetails;
+  };
   return (
     <div>
       <div>
