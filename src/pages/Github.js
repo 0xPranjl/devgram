@@ -2,30 +2,18 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { Octokit } from "@octokit/rest";
 const Github = () => {
   const history = useNavigate();
-
-  const handleLogin = () => {
-    window.location.href = "https://github.com/login/oauth/authorize?client_id="+process.env.REACT_APP_GITHUB_CLIENT_ID+"&redirect_uri=http://localhost:3000/gitredirect&scope=user+repo";
-  };
-
-
-  // Handle the GitHub callback
-//   React.useEffect(() => {
-//     const code = new URLSearchParams(window.location.search).get('code');
-
-//     if (code) {
-//       // Exchange code for access token
-//       // Perform API requests using the access token
-//       // Redirect to the main app after authentication
-//       history.push('/repos');
-//     }
-//   }, [history]);
-
-  return (
+ const REDIRECT_URI="http://localhost:3000/gitredirect";
+ const CLIENT_ID="Iv1.65b8afe4ea264973"
+ const x=()=>{
+  window.location.href="https://github.com/apps/0xdevgram/installations/new";
+ //window.location.href=`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`
+ } 
+ return (
     <div>
-      <button onClick={handleLogin}>Login with GitHub</button>
+      <button onClick={x}>Login with GitHub</button>
     </div>
   );
 };
